@@ -9,7 +9,6 @@ app.get("/user", (req, res) => {
 // This will only handle POST call
 app.post("/user", (req, res) => {
   res.send("Data successfully send to database!");
-  res.send("Data successfully send to database!");
 });
 
 // This will only handle DELETE call

@@ -17,6 +17,7 @@ app.delete("/user", (req, res) => {
 });
 
 // This will  handle all call
+// This will  handle all call
 app.use("/test", (req, res) => {
   res.send("Hello from server");
 });

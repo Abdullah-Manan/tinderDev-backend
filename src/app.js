@@ -14,10 +14,12 @@ app.post("/user", (req, res) => {
 // This will only handle DELETE call
 app.delete("/user", (req, res) => {
   res.send("Data successfully deleted!");
+  res.send("Data successfully deleted!");
 });
 
 // This will  handle all call
 app.use("/test", (req, res) => {
+  res.send("Hello from server");
   res.send("Hello from server");
 });
 

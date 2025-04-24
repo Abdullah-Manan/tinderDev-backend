@@ -8,6 +8,9 @@ app.use(
   },
   (req, res) => {
     res.send("2nd User Detail");
+  },
+  (req, res) => {
+    res.send("2nd User Detail");
   }
 );
 

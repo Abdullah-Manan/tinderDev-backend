@@ -13,6 +13,8 @@
   "author": "Abdullah",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.21.2"
+    "dotenv": "^16.5.0",
+    "express": "^4.21.2",
+    "mongoose": "^8.14.0"
   }
 }

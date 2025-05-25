@@ -1,9 +1,8 @@
 const express = require("express");
 const connectDB = require("./config/database.js"); // Get the function
 const app = express();
-const User = require('./model/userschema');
+const User = require("./model/userschema");
 app.use(express.json());
-
 
 connectDB()
   .then(() => {
@@ -16,9 +15,7 @@ connectDB()
     console.log("Datbase is not connected");
   });
 
-
-
-app.post('/signin', async (req, res) => {
+app.post("/signin", async (req, res) => {
   // console.log("Body",req.body);
   try {
     // const { firstName, lastName, email, age, password, type } = req.body;
@@ -32,13 +29,10 @@ app.post('/signin', async (req, res) => {
     // };
     const user = new User(req.body);
     await user.save();
-    res.status(201).json({ message: 'User saved successfully', user });
+    res.status(201).json({ message: "User saved successfully", user });
   } catch (error) {
-    if (error.code === 11000 && error.keyPattern && error.keyPattern.email) {
-      return res.status(400).json({ error: 'Email already exists' });
-    }
-    res.status(400).json({ error: 'Error saving user', details: error.message });
+    res
+      .status(400)
+      .json({ error: "Error saving user", details: error.message });
   }
 });
-
-

@@ -1,15 +1,9 @@
 const mongoose = require("mongoose");
 
 const connectDB = async () => {
-  try {
-    await mongoose.connect(
-      process.env.MONGO_URI || "mongodb://localhost:27017/devtinder"
-    );
-
-    console.log("MongoDB Connected");
-  } catch (error) {
-    console.log("MongoDB Not Connected");
-  }
+  await mongoose.connect(
+    "mongodb+srv://abdullah:J5D52Pe7_X-35ds@learnnode.ygpwk.mongodb.net/devTinder "
+  );
 };
 
 module.exports = connectDB;

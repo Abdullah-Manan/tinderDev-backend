@@ -54,6 +54,7 @@ app.delete("/delete-user", async (req, res) => {
 connectDB()
   .then(() => {
     console.log("Datbase is connected");
+    console.log("Datbase is connected");
     app.listen(3000, () => {
       console.log("Server is successfully listening on port 3000");
     });

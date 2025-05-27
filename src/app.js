@@ -20,7 +20,11 @@ app.get("/user", async (req, res) => {
   try {
     const userEmail = req.body.email;
     const user = await User.find({ email: userEmail });
-    res.status(201).json({ message: "User", user });
+    if (user.length === 0) {
+      res.status(404).json({ message: "User not found" });
+    } else {
+      res.status(201).json({ message: "User", user });
+    }
   } catch (error) {
     res
       .status(400)
@@ -28,32 +32,67 @@ app.get("/user", async (req, res) => {
   }
 });
 
-app.put("/update-user", async (req, res) => {
+app.patch("/update-user", async (req, res) => {
   try {
-    const userEmail = req.body.email;
-    const user = await User.find({ email: userEmail });
-    res.status(201).json({ message: "User", user });
+    const { userId, firstName, lastName, email, age, password, gender } =
+      req.body;
+    // Check if the new email is already used by another user
+    if (email) {
+      const existingUser = await User.findOne({ email, _id: { $ne: userId } });
+      if (existingUser) {
+        return res
+          .status(409)
+          .json({ error: "Email already in use by another user." });
+      }
+    }
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: userId },
+      { firstName, lastName, email, age, password, gender },
+      { returnDocument: "after" }
+    );
+    if (!updatedUser) {
+      res.status(404).json({ message: "User not found" });
+    } else {
+      res
+        .status(200)
+        .json({ message: "Updated successfully", user: updatedUser });
+    }
   } catch (error) {
     res
       .status(400)
-      .json({ error: "Error saving user", details: error.message });
+      .json({ error: "Error updating user", details: error.message });
   }
 });
+
 app.delete("/delete-user", async (req, res) => {
   try {
-    const userEmail = req.body.email;
-    const user = await User.find({ email: userEmail });
-    res.status(201).json({ message: "User", user });
+    const { userId, email } = req.body;
+    let deletedUser;
+    if (userId) {
+      deletedUser = await User.findByIdAndDelete(userId);
+    } else if (email) {
+      deletedUser = await User.findOneAndDelete({ email });
+    } else {
+      return res
+        .status(400)
+        .json({ error: "Please provide userId or email to delete a user." });
+    }
+    if (!deletedUser) {
+      res.status(404).json({ message: "User not found" });
+    } else {
+      res
+        .status(200)
+        .json({ message: "User deleted successfully", user: deletedUser });
+    }
   } catch (error) {
     res
       .status(400)
-      .json({ error: "Error saving user", details: error.message });
+      .json({ error: "Error deleting user", details: error.message });
   }
 });
 
 connectDB()
   .then(() => {
-    console.log("Datbase is connected");
     console.log("Datbase is connected");
     app.listen(3000, () => {
       console.log("Server is successfully listening on port 3000");

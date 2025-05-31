@@ -36,19 +36,51 @@ app.patch("/update-user", async (req, res) => {
   try {
     const { userId, firstName, lastName, email, age, password, gender } =
       req.body;
-    // Check if the new email is already used by another user
-    if (email) {
-      const existingUser = await User.findOne({ email, _id: { $ne: userId } });
+    const updateFields = {};
+    if (firstName !== undefined) updateFields.firstName = firstName;
+    if (lastName !== undefined) updateFields.lastName = lastName;
+    if (email !== undefined) updateFields.email = email.trim().toLowerCase();
+    if (age !== undefined) updateFields.age = age;
+    if (password !== undefined) updateFields.password = password;
+    if (gender !== undefined) updateFields.gender = gender;
+
+    // Validate fields using schema validators
+    const UserModel = new User({
+      firstName: updateFields.firstName || "A",
+      lastName: updateFields.lastName || "B",
+      email: updateFields.email || "test@example.com",
+      age: updateFields.age !== undefined ? updateFields.age : 18,
+      password: updateFields.password || "1234567",
+      gender: updateFields.gender || "male",
+    });
+    // Only validate the fields being updated
+    for (const key of Object.keys(updateFields)) {
+      try {
+        await UserModel.validate(key);
+      } catch (validationError) {
+        return res.status(400).json({
+          error: `Invalid value for ${key}: ${validationError.message}`,
+        });
+      }
+    }
+
+    // Check for duplicate email
+    if (updateFields.email) {
+      const existingUser = await User.findOne({
+        email: updateFields.email,
+        _id: { $ne: userId },
+      });
       if (existingUser) {
         return res
           .status(409)
           .json({ error: "Email already in use by another user." });
       }
     }
+
     const updatedUser = await User.findOneAndUpdate(
       { _id: userId },
-      { firstName, lastName, email, age, password, gender },
-      { returnDocument: "after" }
+      updateFields,
+      { returnDocument: "after", runValidators: true }
     );
     if (!updatedUser) {
       res.status(404).json({ message: "User not found" });

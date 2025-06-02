@@ -43,6 +43,7 @@ app.patch("/update-user", async (req, res) => {
     if (age !== undefined) updateFields.age = age;
     if (password !== undefined) updateFields.password = password;
     if (gender !== undefined) updateFields.gender = gender;
+    if (gender !== undefined) updateFields.gender = gender;
 
     // Validate fields using schema validators
     const UserModel = new User({
@@ -51,7 +52,6 @@ app.patch("/update-user", async (req, res) => {
       email: updateFields.email || "test@example.com",
       age: updateFields.age !== undefined ? updateFields.age : 18,
       password: updateFields.password || "1234567",
-      gender: updateFields.gender || "male",
       gender: updateFields.gender || "male",
     });
     // Only validate the fields being updated

@@ -43,7 +43,6 @@ app.patch("/update-user", async (req, res) => {
     if (age !== undefined) updateFields.age = age;
     if (password !== undefined) updateFields.password = password;
     if (gender !== undefined) updateFields.gender = gender;
-    if (gender !== undefined) updateFields.gender = gender;
 
     // Validate fields using schema validators
     const UserModel = new User({

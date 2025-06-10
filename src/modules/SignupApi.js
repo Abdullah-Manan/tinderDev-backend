@@ -1,5 +1,5 @@
 const SignupApi = () => {
-  return <div></div>;
+  return <div>Add new file</div>;
 };
 
 export default SignupApi;

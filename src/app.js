@@ -52,6 +52,7 @@ app.patch("/update-user", async (req, res) => {
       age: updateFields.age !== undefined ? updateFields.age : 18,
       password: updateFields.password || "1234567",
       gender: updateFields.gender || "male",
+      gender: updateFields.gender || "male",
     });
     // Only validate the fields being updated
     for (const key of Object.keys(updateFields)) {

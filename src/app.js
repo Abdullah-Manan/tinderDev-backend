@@ -1,5 +1,5 @@
 const express = require("express");
-const connectDB = require("./config/database.js"); // Get the function
+const connectDB = require("./config/database.js");
 const app = express();
 const User = require("./model/userschema");
 app.use(express.json());
@@ -131,6 +131,5 @@ connectDB()
     });
   })
   .catch(() => {
-    console.log("Datbase is not connected");
     console.log("Datbase is not connected");
   });

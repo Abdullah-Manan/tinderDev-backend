@@ -57,6 +57,9 @@ const userSchema = new mongoose.Schema(
       },
     },
     gender: { type: String, required: true },
+    photoUrl: { type: String, default: "https://via.placeholder.com/150" },
+    skills: { type: [String], default: [] },
+    about: { type: String, default: "No bio" },
   },
   { timestamps: true }
 );

@@ -49,6 +49,7 @@ const validationSignUp = (req) => {
   }
 
   // gender: required
+  // gender: required
   if (!gender || typeof gender !== "string") {
     errors.gender = "Gender is required.";
   }

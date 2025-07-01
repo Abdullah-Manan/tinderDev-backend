@@ -142,5 +142,4 @@ connectDB()
   })
   .catch(() => {
     console.log("Datbase is not connected");
-    console.log("Datbase is not connected");
   });

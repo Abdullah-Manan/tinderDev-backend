@@ -1,4 +1,5 @@
 const express = require("express");
+const bcrypt = require("bcryptjs");
 const connectDB = require("./config/database.js");
 const { validationSignUp } = require("./utils/validation.js");
 const app = express();
@@ -13,12 +14,30 @@ app.post("/signin", async (req, res) => {
   if (!isValid) {
     return res.status(400).json({ errors });
   }
+  const { firstName, lastName, email, age, password, gender } = req.body;
 
   try {
-    // 3. Proceed if valid
-    const user = new User(req.body);
-    await user.save();
-    res.status(201).json({ message: "User saved successfully", user });
+    // Check if user already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res
+        .status(400)
+        .json({ errors: { email: "Email is already in use." } });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUser = new User({
+      firstName,
+      lastName,
+      email,
+      age,
+      password: hashedPassword,
+      gender,
+    });
+
+    await newUser.save();
+    res.status(201).json({ message: "User saved successfully", newUser });
   } catch (error) {
     res
       .status(400)
@@ -141,6 +160,5 @@ connectDB()
     });
   })
   .catch(() => {
-    console.log("Datbase is not connected");
     console.log("Datbase is not connected");
   });

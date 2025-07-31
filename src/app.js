@@ -1,10 +1,14 @@
 const express = require("express");
 const bcrypt = require("bcryptjs");
+const cookieParser = require("cookie-parser");
+const jwt = require("jsonwebtoken");
 const connectDB = require("./config/database.js");
 const { validationSignUp } = require("./utils/validation.js");
 const app = express();
 const User = require("./model/userschema");
+const { userAuth } = require("./middleware/auth.js");
 app.use(express.json());
+app.use(cookieParser());
 
 app.post("/signin", async (req, res) => {
   // 1. Validate the request body
@@ -150,6 +154,67 @@ app.delete("/delete-user", async (req, res) => {
       .status(400)
       .json({ error: "Error deleting user", details: error.message });
   }
+});
+
+app.get("/feed", async (req, res) => {
+  try {
+    const users = await User.find();
+    res.status(200).json({
+      success: true,
+      count: users.length,
+      data: users,
+    });
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server Error: Unable to fetch users",
+    });
+  }
+});
+
+app.get("/profile", userAuth, async (req, res) => {
+  try {
+    const user = req.user;
+    res.status(200).json({ message: "Profile fetched successfully", user });
+  } catch (error) {
+    res
+      .status(400)
+      .json({ error: "Error fetching user", details: error.message });
+  }
+});
+
+app.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    console.log("email", email);
+    console.log("password", password);
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(401).json({ error: "Invalid credentials" });
+    }
+    const isPasswordValid = await user.validatePassword(password);
+
+    // generate token
+    if (isPasswordValid) {
+      const token = await user.generateAuthToken();
+      res.cookie("token", token);
+      res
+        .status(200)
+        .json({ message: "Login successful", user: user, token: token });
+      return;
+    }
+    return res.status(401).json({ error: "Invalid credentials" });
+    // add cookies
+  } catch (error) {
+    res.status(400).json({ error: "Error logging in", details: error.message });
+  }
+});
+
+app.get("/logout", (req, res) => {
+  res.clearCookie("token");
+  res.status(200).json({ message: "Logged out successfully" });
 });
 
 connectDB()

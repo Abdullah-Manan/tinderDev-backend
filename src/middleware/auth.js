@@ -1,5 +1,8 @@
-const auth = (req, res, next) => {
-  const token = "xyz";
+const jwt = require("jsonwebtoken");
+const User = require("../model/userschema");
+
+const userAuth = async (req, res, next) => {
+  const { token } = req.cookies;
 
   try {
     if (!token) {
@@ -7,8 +10,18 @@ const auth = (req, res, next) => {
         .status(401)
         .json({ message: "No authentication token, access denied" });
     }
-    // Here you would typically verify the token
-    // For now, we'll just check if it exists
+    const isTokenValid = jwt.verify(token, "secret");
+    if (!isTokenValid) {
+      return res
+        .status(401)
+        .json({ message: "Invalid authentication token, access denied" });
+    }
+    const { _id } = isTokenValid;
+    const user = await User.findById({ _id });
+    if (!user) {
+      return res.status(401).json({ message: "User not found, access denied" });
+    }
+    req.user = user;
     next();
   } catch (err) {
     res
@@ -16,22 +29,4 @@ const auth = (req, res, next) => {
       .json({ message: "Token verification failed, authorization denied" });
   }
 };
-
-const auth2 = (req, res, next) => {
-  const token = "";
-
-  try {
-    if (!token) {
-      next();
-    }
-
-    return res
-      .status(401)
-      .json({ message: "No authentication token, access denied" });
-  } catch (err) {
-    res
-      .status(401)
-      .json({ message: "Token verification failed, authorization denied" });
-  }
-};
-module.exports = { auth, auth2 };
+module.exports = { userAuth };

@@ -1,53 +1,17 @@
 const express = require("express");
-const bcrypt = require("bcryptjs");
 const cookieParser = require("cookie-parser");
-const jwt = require("jsonwebtoken");
 const connectDB = require("./config/database.js");
-const { validationSignUp } = require("./utils/validation.js");
 const app = express();
 const User = require("./model/userschema");
 const { userAuth } = require("./middleware/auth.js");
+const { authRouter } = require("./routes/auth.js");
+const { profileRouter } = require("./routes/profile.js");
+const { requestRouter } = require("./routes/request.js");
 app.use(express.json());
 app.use(cookieParser());
-
-app.post("/signin", async (req, res) => {
-  // 1. Validate the request body
-  const { isValid, errors } = validationSignUp(req);
-
-  // 2. If not valid, return errors
-  if (!isValid) {
-    return res.status(400).json({ errors });
-  }
-  const { firstName, lastName, email, age, password, gender } = req.body;
-
-  try {
-    // Check if user already exists
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res
-        .status(400)
-        .json({ errors: { email: "Email is already in use." } });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const newUser = new User({
-      firstName,
-      lastName,
-      email,
-      age,
-      password: hashedPassword,
-      gender,
-    });
-
-    await newUser.save();
-    res.status(201).json({ message: "User saved successfully", newUser });
-  } catch (error) {
-    res
-      .status(400)
-      .json({ ERROR: "Error saving user", details: error.message });
-  }
-});
+app.use("/", authRouter);
+app.use("/", profileRouter);
+app.use("/", requestRouter);
 
 app.get("/user", async (req, res) => {
   try {
@@ -173,50 +137,6 @@ app.get("/feed", async (req, res) => {
   }
 });
 
-app.get("/profile", userAuth, async (req, res) => {
-  try {
-    const user = req.user;
-    res.status(200).json({ message: "Profile fetched successfully", user });
-  } catch (error) {
-    res
-      .status(400)
-      .json({ error: "Error fetching user", details: error.message });
-  }
-});
-
-app.post("/login", async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    console.log("email", email);
-    console.log("password", password);
-    const user = await User.findOne({ email });
-
-    if (!user) {
-      return res.status(401).json({ error: "Invalid credentials" });
-    }
-    const isPasswordValid = await user.validatePassword(password);
-
-    // generate token
-    if (isPasswordValid) {
-      const token = await user.generateAuthToken();
-      res.cookie("token", token);
-      res
-        .status(200)
-        .json({ message: "Login successful", user: user, token: token });
-      return;
-    }
-    return res.status(401).json({ error: "Invalid credentials" });
-    // add cookies
-  } catch (error) {
-    res.status(400).json({ error: "Error logging in", details: error.message });
-  }
-});
-
-app.get("/logout", (req, res) => {
-  res.clearCookie("token");
-  res.status(200).json({ message: "Logged out successfully" });
-});
-
 connectDB()
   .then(() => {
     console.log("Datbase is connected");
@@ -225,6 +145,5 @@ connectDB()
     });
   })
   .catch(() => {
-    console.log("Datbase is not connected");
     console.log("Datbase is not connected");
   });

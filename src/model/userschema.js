@@ -61,6 +61,7 @@ const userSchema = new mongoose.Schema(
     photoUrl: { type: String, default: "https://via.placeholder.com/150" },
     skills: { type: [String], default: [] },
     about: { type: String, default: "No bio" },
+    pendingRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   },
   { timestamps: true }
 );

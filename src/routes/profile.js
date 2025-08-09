@@ -15,7 +15,7 @@ profileRouter.get("/profile", userAuth, async (req, res) => {
   }
 });
 
-profileRouter.post("/profile/edit", userAuth, async (req, res) => {
+profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
   try {
     const { isValid, errors } = profileEditValidation(req);
     if (!isValid) {
@@ -28,7 +28,6 @@ profileRouter.post("/profile/edit", userAuth, async (req, res) => {
     const allowedFields = [
       "firstName",
       "lastName",
-      "email",
       "age",
       "gender",
       "photoUrl",
@@ -40,18 +39,7 @@ profileRouter.post("/profile/edit", userAuth, async (req, res) => {
         updateFields[field] = req.body[field];
       }
     });
-    // Prevent email change to an existing email
-    if (updateFields.email) {
-      const existingUser = await User.findOne({
-        email: updateFields.email,
-        _id: { $ne: userId },
-      });
-      if (existingUser) {
-        return res
-          .status(409)
-          .json({ error: "Email already in use by another user." });
-      }
-    }
+
     const updatedUser = await User.findByIdAndUpdate(userId, updateFields, {
       new: true,
       runValidators: true,

@@ -14,6 +14,14 @@ requestRouter.post(
       const fromUserId = req.user._id;
       const toUserId = req.params.toUserId;
       const status = req.params.status;
+
+      const statusInclude = ["intrested", "ignored"];
+      if (!statusInclude.includes(status)) {
+        return res.status(404).json({
+          message: "Invalid request status",
+        });
+      }
+      const sendRequest = new ConnectionRequest();
     } catch (error) {
       res.status(500).json({
         error: "Failed to send connection request",

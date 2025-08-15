@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const connectionRequestSchema = new mongoose.Schema(
   {
-    formUserId: {
+    fromUserId: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
     },
@@ -14,7 +14,7 @@ const connectionRequestSchema = new mongoose.Schema(
       type: String,
       required: true,
       enum: {
-        values: ["ignored", "inrested", "rejected", "accepted"],
+        values: ["ignored", "interested", "rejected", "accepted"],
         message: `{VALUE} is incorrect status type`,
       },
     },

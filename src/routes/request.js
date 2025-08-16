@@ -96,4 +96,54 @@ requestRouter.post(
   }
 );
 
+requestRouter.post(
+  "/request/review/:status/:requestId",
+  userAuth,
+  async (req, res) => {
+    try {
+      const loggedInUserId = req.user._id;
+      const { requestId, status } = req.params;
+
+      const VALID_STATUSES = ["accepted", "rejected"];
+
+      // Basic input guards
+      if (!VALID_STATUSES.includes(status)) {
+        return res.status(400).json({ message: "Invalid request status" });
+      }
+      if (!mongoose.Types.ObjectId.isValid(requestId)) {
+        return res.status(400).json({ message: "Invalid requestId" });
+      }
+
+      // Bidirectional duplicate check via $or: (A→B) or (B→A)
+      const connectionRequest = await ConnectionRequest.findOne({
+        _id: requestId,
+        toUserId: loggedInUserId,
+        status: "interested",
+      });
+
+      if (!connectionRequest) {
+        return res.status(409).json({
+          message: "No Connection request available",
+          requestId: existing._id,
+          status: existing.status,
+        });
+      }
+
+      connectionRequest.status = status;
+
+      const saved = await connectionRequest.save();
+
+      return res.status(201).json({
+        message: "Connection request " + status,
+        data: saved,
+      });
+    } catch (error) {
+      return res.status(500).json({
+        error: "Failed to send connection request",
+        details: error.message,
+      });
+    }
+  }
+);
+
 module.exports = { requestRouter };

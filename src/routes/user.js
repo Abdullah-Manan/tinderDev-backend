@@ -41,6 +41,7 @@ userRouter.get("/user/request/received", userAuth, async (req, res) => {
 });
 
 // get all the connections of the logged in user
+// this will return all the users that the logged in user is connected to
 userRouter.get("/user/connections", userAuth, async (req, res) => {
   try {
     if (!req.user || !req.user._id) {

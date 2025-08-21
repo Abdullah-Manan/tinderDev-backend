@@ -127,6 +127,7 @@ userRouter.get("/feed", userAuth, async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Failed to fetch feed.",
+      message: "Failed to fetch feed.",
     });
   }
 });

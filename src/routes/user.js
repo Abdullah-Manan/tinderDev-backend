@@ -7,7 +7,14 @@ const User = require("../model/userschema");
 
 const userRouter = express.Router();
 
-const allowData = ["firstName", "lastName", "email", "photoUrl", "skills"];
+const allowData = [
+  "firstName",
+  "lastName",
+  "email",
+  "photoUrl",
+  "skills",
+  "about",
+];
 
 // get all the connection requests received by the logged in user
 userRouter.get("/user/request/received", userAuth, async (req, res) => {
@@ -126,7 +133,6 @@ userRouter.get("/feed", userAuth, async (req, res) => {
     console.error("Error fetching Feed:", error);
     return res.status(500).json({
       success: false,
-      message: "Failed to fetch feed.",
       message: "Failed to fetch feed.",
     });
   }

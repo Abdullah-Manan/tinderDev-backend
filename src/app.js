@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
@@ -27,8 +28,10 @@ app.use("/", userRouter);
 connectDB()
   .then(() => {
     console.log("Datbase is connected");
-    app.listen(7777, () => {
-      console.log("Server is successfully listening on port 7777");
+    app.listen(process.env.PORT, () => {
+      console.log(
+        "Server is successfully listening on port " + process.env.PORT
+      );
     });
   })
   .catch(() => {

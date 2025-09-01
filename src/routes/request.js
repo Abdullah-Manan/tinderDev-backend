@@ -4,6 +4,9 @@ const User = require("../model/userschema.js");
 const ConnectionRequest = require("../model/connectionRequest.js");
 const mongoose = require("mongoose");
 const requestRouter = express.Router();
+const sendEmail = require("../utils/sendEmail.js");
+
+// ... existing code ...
 
 // POST /sendConnectionRequest
 // requestRouter.post(
@@ -81,6 +84,16 @@ requestRouter.post(
       });
 
       const saved = await sendRequest.save();
+      const emailResponse = await sendEmail.run(
+        status,
+        "A new " +
+          status +
+          " connection request from " +
+          req.user.firstName +
+          " " +
+          req.user.lastName
+      );
+      console.log(emailResponse);
 
       return res.status(201).json({
         message: "Connection request sent",

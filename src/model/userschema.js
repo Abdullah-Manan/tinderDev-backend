@@ -58,7 +58,11 @@ const userSchema = new mongoose.Schema(
       },
     },
     gender: { type: String, required: true },
-    photoUrl: { type: String, default: "https://via.placeholder.com/150" },
+    photoUrl: {
+      type: String,
+      default:
+        "https://www.shutterstock.com/image-photo/young-brazilian-man-isolated-on-260nw-2242569333.jpg",
+    },
     skills: { type: [String], default: [] },
     about: { type: String, default: "No bio" },
     pendingRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],

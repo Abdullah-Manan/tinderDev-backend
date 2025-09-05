@@ -1,10 +1,14 @@
 require("dotenv").config();
+const http = require("http");
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const connectDB = require("./config/database.js");
 const { cron } = require("./utils/cronjobs.js");
+const initializeSocket = require("./utils/socket.js");
 const app = express();
+const server = http.createServer(app);
+initializeSocket(server);
 
 app.use(
   cors({
@@ -28,7 +32,7 @@ app.use("/", userRouter);
 connectDB()
   .then(() => {
     console.log("Datbase is connected");
-    app.listen(process.env.PORT, () => {
+    server.listen(process.env.PORT, () => {
       console.log(
         "Server is successfully listening on port " + process.env.PORT
       );
